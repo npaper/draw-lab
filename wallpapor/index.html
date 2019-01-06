@@ -2,7 +2,11 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,maximum-scale=1.0,user-scalable=0;"
+      name="viewport"
+    />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <title>代码绘图</title>
   </head>
@@ -199,12 +203,16 @@
       }
 
       function refreshValue() {
-        var exr = document.querySelector("#ex_r");
-        var exg = document.querySelector("#ex_g");
-        var exb = document.querySelector("#ex_b");
-        rstr = exr.value || "255";
-        gstr = exg.value || "255";
-        bstr = exb.value || "255";
+        try {
+          var exr = document.querySelector("#ex_r");
+          var exg = document.querySelector("#ex_g");
+          var exb = document.querySelector("#ex_b");
+          rstr = exr.value || "255";
+          gstr = exg.value || "255";
+          bstr = exb.value || "255";
+        } catch (err) {
+          alert("错误的表达式");
+        }
       }
 
       function toCenter() {
