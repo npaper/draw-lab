@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>代码绘图</title>
+  </head>
+  <style>
+    body {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      bottom: 0px;
+      top: 0px;
+      background-color: #ccc;
+      text-align: center;
+      padding: 0px;
+      margin: 0px;
+      overflow: hidden;
+    }
+
+    #bg {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      padding: 0px;
+      margin: 0px;
+      width: 100%;
+      height: 100%;
+      z-index: -10;
+      overflow: hidden;
+    }
+
+    #bg canvas {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    canvas {
+      margin-top: 20px;
+      width: 500px;
+      height: 500px;
+      /* border: 1px #ccc solid; */
+      box-shadow: 0px 0px 10px 2px #615e5e;
+    }
+
+    input[type="text"] {
+      width: 80%;
+      height: 20px;
+      padding: 4px;
+      margin: 4px;
+      border: 1px #ccc solid;
+      outline: none;
+      border-radius: 5px;
+      padding-left: 10px;
+      background-color: #ffffff85;
+    }
+
+    button {
+      padding-top: 10px;
+      padding-bottom: 10px;
+
+      margin-top: 10px;
+
+      font-weight: bolder;
+      background-color: darkslategray;
+      color: white;
+      outline: none;
+      border: 0px;
+      border-radius: 5px;
+    }
+
+    button#draw {
+      width: 40%;
+    }
+
+    button.btn {
+      margin-left: 2px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    span {
+      font-weight: bold;
+      color: #666;
+      text-shadow: 1px 1px 1px rgb(255, 249, 249);
+    }
+
+    button:active {
+      background-color: rgba(47, 79, 79, 0.685);
+    }
+  </style>
+  <body>
+    <div id="bg"><canvas></canvas></div>
+    <div style="margin-top: 20px;">
+      <div><span>R: </span><input id="ex_r" type="text" value="x" /></div>
+      <div><span>G: </span><input id="ex_g" type="text" value="y" /></div>
+      <div><span>B: </span><input id="ex_b" type="text" value="x+y" /></div>
+      <div>
+        <button class="btn" onclick="refresh()">绘 图</button>
+        <button class="btn" onclick="clearValues()">清 除</button>
+        <button class="btn" onclick="toCenter()">居 中</button>
+        <button class="btn" onclick="save()">保 存</button>
+        <button id="play" class="btn" onclick="play(this)">播 放</button>
+      </div>
+      <div><span id="offsetStr"></span></div>
+    </div>
+    <div><canvas id="preview"> </canvas></div>
+    <div>
+      <span>缩放：</span> <span id="scaleStr">4</span>
+      <button class="btn" onclick="scale(1)">+</button>
+      <button class="btn" onclick="scale(-1)">-</button>
+    </div>
+
+    <script>
+      var scaleV = 4;
+      var w0 = 0;
+      var h0 = 0;
+      var t = 0;
+      var tindex = 0;
+      var rstr = "255";
+      var gstr = "255";
+      var bstr = "255";
+
+      async function draw(_canvas, offsetX, offsetY) {
+        var canvas = _canvas || document.querySelector("#preview");
+        if (canvas instanceof HTMLCanvasElement) {
+          var context = canvas.getContext("2d");
+          context.imageSmoothingEnabled = true;
+          context.scale(scaleV, scaleV);
+          var w = canvas.width;
+          var h = canvas.height;
+
+          offsetX = Math.floor(offsetX || 0);
+          offsetY = Math.floor(offsetY || 0);
+
+          document.querySelector(
+            "#offsetStr"
+          ).textContent = `Offset: ${offsetX}, ${offsetY}; tick: ${t}`;
+
+          context.clearRect(0, 0, w, h);
+
+          var imgData = context.getImageData(0, 0, w, h);
+
+          var fun_r = eval(
+            "(function() {return function(x,y,w,h,t){return " + rstr + ";}})()"
+          );
+          var fun_g = eval(
+            "(function() {return function(x,y,w,h,t){return " + gstr + ";}})()"
+          );
+          var fun_b = eval(
+            "(function() {return function(x,y,w,h,t){return " + bstr + ";}})()"
+          );
+
+          var i = 0;
+          for (var y = 0; y < h; y++) {
+            for (var x = 0; x < w; x++) {
+              imgData.data[i++] = fun_r(x + offsetX, y + offsetY, w, h, t);
+              imgData.data[i++] = fun_g(x + offsetX, y + offsetY, w, h, t);
+              imgData.data[i++] = fun_b(x + offsetX, y + offsetY, w, h, t);
+              imgData.data[i++] = 255;
+            }
+          }
+
+          context.putImageData(imgData, 0, 0);
+        }
+      }
+
+      var offsetX = 0;
+      var offsetY = 0;
+
+      function clearOffset() {
+        offsetX = 0;
+        offsetY = 0;
+      }
+
+      function drawBg() {
+        draw(document.querySelector("#bg canvas"), offsetX, offsetY);
+      }
+
+      function clearValues() {
+        clearOffset();
+        t = 0;
+        stop(document.querySelector("#play"));
+        var exr = document.querySelector("#ex_r");
+        var exg = document.querySelector("#ex_g");
+        var exb = document.querySelector("#ex_b");
+
+        exr.value = "";
+        exg.value = "";
+        exb.value = "";
+        draw();
+        drawBg();
+      }
+
+      function refreshValue() {
+        var exr = document.querySelector("#ex_r");
+        var exg = document.querySelector("#ex_g");
+        var exb = document.querySelector("#ex_b");
+        rstr = exr.value || "255";
+        gstr = exg.value || "255";
+        bstr = exb.value || "255";
+      }
+
+      function toCenter() {
+        var canvas = document.querySelector("#preview");
+        offsetX = -canvas.width / 2;
+        offsetY = -canvas.height / 2;
+        draw(canvas, offsetX, offsetY);
+        drawBg();
+      }
+
+      function scale(v) {
+        if (scaleV + v <= 0) return;
+        var canvas = document.querySelector("#preview");
+        scaleV += v;
+
+        document.querySelector("#scaleStr").textContent = scaleV + "";
+
+        canvas.width = w0 * scaleV;
+        canvas.height = h0 * scaleV;
+
+        var c = document.querySelector("#bg canvas");
+        c.width = window.innerWidth * scaleV;
+        c.height = window.innerHeight * scaleV;
+
+        draw(canvas, offsetX, offsetY);
+        drawBg();
+      }
+
+      function dataURItoBlob(dataURI) {
+        var byteString = atob(dataURI.split(",")[1]);
+        var mimeString = dataURI
+          .split(",")[0]
+          .split(":")[1]
+          .split(";")[0];
+        var ab = new ArrayBuffer(byteString.length);
+        var ia = new Uint8Array(ab);
+        for (var i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        return new Blob([ab], { type: mimeString });
+      }
+
+      function saveAsMobile() {
+        var canvas = document.querySelector("#bg canvas");
+        var strDataURI = canvas.toDataURL("image/png");
+        var data = dataURItoBlob(strDataURI);
+        window.location.href = data;
+      }
+
+      function save() {
+        var canvas = document.querySelector("#bg canvas");
+        var image = canvas
+          .toDataURL("image/png", 100)
+          .replace("image/png", "image/octet-stream");
+        window.location.href = image; // it will save locally
+      }
+
+      function refresh() {
+        stop(document.querySelector("#play"));
+        t = 0;
+        refreshValue();
+        clearOffset();
+        draw();
+        drawBg();
+        t = 0;
+      }
+
+      function play(e) {
+        if (tindex) {
+          stop(e);
+        } else {
+          var canvas = document.querySelector("#preview");
+          tindex = setInterval(() => {
+            t += 1;
+            draw(canvas, offsetX, offsetY);
+          }, 300);
+          e.textContent = "暂 停";
+        }
+      }
+
+      function stop(e) {
+        tindex && clearInterval(tindex);
+        tindex = 0;
+        e.textContent = "播 放";
+        drawBg();
+      }
+
+      function bindMouse(canvas) {
+        if (!canvas) return;
+        if (canvas instanceof HTMLCanvasElement) {
+          var startX = 0;
+          var startY = 0;
+
+          var canMove = false;
+          var ox = 0;
+          var oy = 0;
+
+          var hdown = ev => {
+            var ev = ev || window.event;
+            ev.touches && (ev = ev.touches[0]);
+            if (!ev) return;
+            startX = ev.clientX;
+            startY = ev.clientY;
+
+            canMove = true;
+          };
+
+          var hmove = ev => {
+            if (!canMove) return;
+            var ev = ev || window.event;
+            ev.touches && (ev = ev.touches[0]);
+            if (!ev) return;
+            ox = ev.clientX - startX;
+            oy = ev.clientY - startY;
+            draw(canvas, offsetX + ox, offsetY + oy);
+          };
+
+          var hup = ev => {
+            if (!canMove) return;
+            offsetX += ox;
+            offsetY += oy;
+            canMove = false;
+            drawBg();
+          };
+
+          canvas.addEventListener("mousedown", hdown);
+          document.addEventListener("mousemove", hmove);
+          document.addEventListener("mouseup", hup);
+          canvas.addEventListener("touchstart", hdown);
+          document.addEventListener("touchmove", hmove);
+          document.addEventListener("touchend", hup);
+        }
+      }
+
+      window.onload = function() {
+        var canvas = document.querySelector("#preview");
+        var w = Math.min(window.innerWidth, window.innerHeight);
+        canvas.style.width = w * 0.6 + "px";
+        canvas.style.height = w * 0.6 + "px";
+        w0 = canvas.width;
+        h0 = canvas.height;
+
+        scale(0);
+        refreshValue();
+        draw(canvas);
+        drawBg();
+
+        bindMouse(canvas);
+      };
+    </script>
+  </body>
+</html>
