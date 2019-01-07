@@ -69,7 +69,7 @@
       padding-top: 10px;
       padding-bottom: 10px;
 
-      margin-top: 10px;
+      margin-top: 6px;
 
       font-weight: bolder;
       background-color: darkslategray;
@@ -77,6 +77,14 @@
       outline: none;
       border: 0px;
       border-radius: 5px;
+    }
+
+    .dialog button {
+      background-color: rgb(110, 212, 212);
+    }
+
+    .dialog button:active {
+      background-color: rgb(125, 241, 241);
     }
 
     button#draw {
@@ -96,7 +104,179 @@
     }
 
     button:active {
-      background-color: rgba(47, 79, 79, 0.685);
+      background-color: rgb(71, 119, 119);
+    }
+
+    .foot {
+      position: absolute;
+      bottom: 0px;
+      height: 50px;
+      line-height: 50px;
+      /* width: 100%; */
+      text-align: right;
+      margin-right: 20px;
+      right: 0px;
+    }
+
+    .foot a {
+      font-weight: normal;
+      color: white;
+      text-shadow: 0px 0px 8px #000;
+      text-decoration: none;
+      margin-right: 20px;
+      outline: none;
+    }
+
+    .foot a:hover,
+    .btns a:hover,
+    #full.dialog .close a:hover {
+      color: #ccc;
+      text-shadow: 0px 0px 8px white;
+    }
+
+    .foot a:active,
+    .btns a:active,
+    #full.dialog .close a:active {
+      color: #ddd;
+      text-shadow: 0px 0px 8px white;
+    }
+
+    .dialog {
+      position: absolute;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+      z-index: 100;
+      display: none;
+      text-align: center;
+    }
+
+    .dialog .mask {
+      float: left;
+      width: 100%;
+      height: 100%;
+      background-color: #000000bf;
+    }
+
+    .dialog .content {
+      position: relative;
+      width: 60%;
+      display: inline-block;
+      top: -60%;
+    }
+
+    .dialog span {
+      color: white;
+      text-shadow: 0px 0px 0px rgb(82, 81, 81);
+    }
+
+    .dialog span.err {
+      color: red;
+      font-weight: normal;
+    }
+
+    #push.dialog span {
+      float: left;
+      padding-left: 20px;
+    }
+
+    #info .content {
+      text-align: center;
+    }
+
+    #info.dialog {
+      z-index: 101;
+    }
+
+    .dialog .content.pager,
+    #full.dialog .content {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      background-color: white;
+      left: 0px;
+      right: 0px;
+      top: 0px;
+      bottom: 0px;
+    }
+
+    #full.dialog .content canvas {
+      width: 100%;
+      height: 100%;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    #full.dialog .close {
+      position: relative;
+      bottom: 10%;
+    }
+
+    #full.dialog .close a {
+      font-size: 32px;
+      text-decoration: none;
+      color: white;
+      text-shadow: 0px 0px 8px #000;
+    }
+
+    .dialog .works {
+      overflow-y: auto;
+      height: 98%;
+    }
+
+    .dialog .works .item {
+      display: inline-block;
+      margin: 20px;
+    }
+
+    .dialog .works .item canvas {
+      border-radius: 15px;
+    }
+
+    .dialog .works .item .item_info {
+      position: relative;
+      bottom: 76px;
+      height: 50px;
+      line-height: 50px;
+      background-color: #a91717;
+      border-bottom-left-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+
+    .dialog .works .item .btns {
+      bottom: 86px;
+      position: relative;
+      right: 0px;
+      text-align: right;
+      padding-right: 20px;
+    }
+
+    .btns a {
+      color: white;
+      text-shadow: 0px 0px 8px #000;
+      margin-left: 10px;
+      text-decoration: none;
+    }
+
+    .dialog .works .item .item_info div {
+      display: inline-block;
+    }
+
+    .dialog .works .item .item_info div span {
+      color: white;
+    }
+
+    .dialog .works .item .item_info div:first-child {
+      float: left;
+      margin-left: 10px;
+      font-weight: bold;
+      font-size: 20px;
+    }
+
+    .dialog .works .item .item_info div:last-child {
+      float: right;
+      margin-right: 10px;
     }
   </style>
   <body>
@@ -119,6 +299,63 @@
       <span>缩放：</span> <span id="scaleStr">4</span>
       <button class="btn" onclick="scale(1)">+</button>
       <button class="btn" onclick="scale(-1)">-</button>
+
+      <button class="btn" onclick="showPushDialog(true)">提 交</button>
+    </div>
+    <div class="foot">
+      <a href="javascript:showHelp();">帮 助</a>
+      <a href="javascript:showPagersDailog(true);">更 多</a>
+    </div>
+
+    <div class="dialog" id="push">
+      <div class="mask"></div>
+      <div class="content">
+        <div><span>名称：</span><input id="name" type="text" /></div>
+        <div>
+          <span>标签：</span
+          ><input id="tags" type="text" placeholder="’,‘为分隔符" />
+        </div>
+        <div>
+          <button class="btn" onclick="pushData()" style="width:140px;">
+            提 交
+          </button>
+          <button class="btn" onclick="showPushDialog(false)">取 消</button>
+        </div>
+        <span id="err" class="err"></span>
+      </div>
+    </div>
+    <div class="dialog" id="pagers">
+      <div class="content pager">
+        <div>
+          <button class="btn" onclick="list(-1)">上一页</button>
+          <button class="btn" onclick="list(1)">下一页</button>
+          <button class="btn" onclick="showPagersDailog(false)">返 回</button>
+        </div>
+        <div class="works"></div>
+      </div>
+    </div>
+    <div class="dialog" id="info">
+      <div class="mask"></div>
+      <div class="content">
+        <div><span class="msg"> </span></div>
+        <div>
+          <button
+            class="btn"
+            style="margin-top:40px"
+            onclick="showInfoDialog(false)"
+          >
+            确 定
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="dialog" id="full">
+      <div class="content">
+        <canvas></canvas>
+        <div class="close">
+          <a href="javascript:showFullDialog(false);">x</a>
+        </div>
+      </div>
     </div>
 
     <script>
@@ -132,6 +369,19 @@
       var bstr = "255";
 
       async function draw(_canvas, offsetX, offsetY) {
+        await _draw(_canvas, offsetX, offsetY, rstr, gstr, bstr, t, scaleV);
+      }
+
+      async function _draw(
+        _canvas,
+        offsetX,
+        offsetY,
+        rstr,
+        gstr,
+        bstr,
+        t,
+        scaleV
+      ) {
         var canvas = _canvas || document.querySelector("#preview");
         if (canvas instanceof HTMLCanvasElement) {
           var context = canvas.getContext("2d");
@@ -145,7 +395,7 @@
 
           document.querySelector(
             "#offsetStr"
-          ).textContent = `Offset: ${offsetX}, ${offsetY}; tick: ${t}`;
+          ).textContent = `偏移: ${offsetX}, ${offsetY}; 时间: ${t}`;
 
           context.clearRect(0, 0, w, h);
 
@@ -172,6 +422,11 @@
           }
 
           context.putImageData(imgData, 0, 0);
+          setTimeout(() => {
+            delete imgData;
+            delete context;
+            delete canvas;
+          }, 10);
         }
       }
 
@@ -345,6 +600,270 @@
           document.addEventListener("touchmove", hmove);
           document.addEventListener("touchend", hup);
         }
+      }
+
+      function request(methods, url, param, cbk) {
+        var xhr = new XMLHttpRequest();
+
+        if (methods == undefined) {
+          methods = "GET";
+        }
+        xhr.open(methods, url, true);
+
+        if (param == undefined) {
+          param = "";
+        }
+
+        // xhr.setRequestHeader("Content-Length", param.lenght);
+        methods == "POST" &&
+          xhr.setRequestHeader(
+            "Content-Type",
+            "application/x-www-form-urlencoded;"
+          );
+        xhr.addEventListener("load", function() {
+          var data = JSON.parse(xhr.response);
+          if (xhr.status == 200) {
+            cbk(data);
+          } else {
+            cbk(null, data);
+          }
+        });
+        try {
+          xhr.send(param);
+        } catch (err) {
+          cbk(null, err);
+        }
+      }
+
+      function get(url, cbk) {
+        request("GET", url, "", cbk);
+      }
+
+      function post(url, data, cbk) {
+        var paramArr = [];
+        for (var key in data) {
+          paramArr.push(key + "=" + encodeURIComponent(data[key]));
+        }
+        request("POST", url, encodeURI(paramArr.join("&")), cbk);
+      }
+
+      function showPushDialog(show) {
+        document.querySelector("#push").style.display = show ? "block" : "none";
+        if (show) {
+          stop(document.querySelector("#play"));
+        }
+      }
+
+      function showInfoDialog(show, msg) {
+        document.querySelector("#info").style.display = show ? "block" : "none";
+        msg && (document.querySelector("#info .msg").textContent = msg);
+      }
+
+      function showPagersDailog(show) {
+        document.querySelector("#pagers").style.display = show
+          ? "block"
+          : "none";
+        if (show) {
+          stop(document.querySelector("#play"));
+          list(0);
+        }
+      }
+
+      function showFullDialog(show, idOrItem) {
+        document.querySelector("#full").style.display = show ? "block" : "none";
+        if (show && idOrItem) {
+          // var canvas = document.querySelector("#full canvas");
+          if (typeof idOrItem == "number") {
+            idOrItem = pagerData[idOrItem];
+          }
+          genCanvas(idOrItem, true);
+        }
+      }
+
+      function showHelp() {
+        showInfoDialog(
+          true,
+          "通过表达式生成图片颜色值(0-255)，分别有 R、G、B 三个分量。其中预留了变量 x(坐标 x)、y(坐标 y)、t(时间 t)、h(高度)、w(宽度)，通过这些变量以及 Math 函数，就可以生成丰富多彩的图片。"
+        );
+      }
+
+      function genCanvas(item, full) {
+        var w0 = window.innerWidth;
+        var h0 = window.innerHeight;
+        var canvas = null;
+        var default_set = item.default_set
+          ? JSON.parse(decodeURIComponent(item.default_set))
+          : {};
+        var scaleV = default_set.scaleV || 4;
+
+        if (full) {
+          canvas = document.querySelector(`#full canvas`);
+          scaleV = 4;
+        } else {
+          var div = document.querySelector(`#item_${item.id}`);
+
+          var w = Math.min(window.innerWidth, window.innerHeight);
+          div.style.height = w * 0.8 + "px";
+          canvas = document.querySelector(`#item_${item.id} canvas`);
+
+          w0 = w * 0.8;
+          h0 = w * 0.8;
+        }
+
+        canvas.style.width = w0 + "px";
+        canvas.style.height = h0 + "px";
+        canvas.width = w0 * scaleV;
+        canvas.height = h0 * scaleV;
+
+        var offsetX = default_set.offsetX || 0;
+        var offsetY = default_set.offsetY || 0;
+        var t = default_set.t || 0;
+        var rstr = decodeURIComponent(item.r);
+        var gstr = decodeURIComponent(item.g);
+        var bstr = decodeURIComponent(item.b);
+
+        _draw(canvas, offsetX, offsetY, rstr, gstr, bstr, t, scaleV);
+      }
+
+      var page = 1;
+      var limit = 5;
+      var pagerData = {};
+
+      function zangWork(id, e) {
+        var item = pagerData[id];
+        if (!item) {
+          showInfoDialog(true, "无该选项");
+          return;
+        }
+        post("wp/zang", { id: item.id }, (res, err) => {
+          if (err) {
+            console.error(err);
+            showInfoDialog(true, "错误：点赞未成功!");
+            return;
+          }
+          item.zang++;
+          document.querySelector(
+            "#item_" + item.id + " .btns a:last-child"
+          ).textContent = `赞(${item.zang})`;
+        });
+      }
+
+      function editWork(id) {
+        var item = pagerData[id];
+        if (!item) {
+          showInfoDialog(true, "无该选项");
+          return;
+        }
+        showPagersDailog(false);
+        var set = decodeURIComponent(item.default_set);
+        offsetX = set.offsetX || 0;
+        offsetY = set.offsetY || 0;
+        t = item.t || 0;
+        scaleV = item.scaleV || 4;
+
+        var exr = document.querySelector("#ex_r");
+        var exg = document.querySelector("#ex_g");
+        var exb = document.querySelector("#ex_b");
+
+        exr.value = decodeURIComponent(item.r);
+        exg.value = decodeURIComponent(item.g);
+        exb.value = decodeURIComponent(item.b);
+
+        scale(0);
+        refreshValue();
+        var canvas = document.querySelector("#preview");
+        draw(canvas, offsetX, offsetY);
+        drawBg();
+      }
+
+      function list(f) {
+        var data = {
+          page: page + f,
+          limit: limit
+        };
+        post("wp/list", data, (res, err) => {
+          if (err) {
+            console.error(err);
+          } else {
+            if (res.errorCode == 0 && res.result && res.result.length > 0) {
+              page += f;
+
+              var works = document.querySelector("#pagers .works");
+              works.textContent = "";
+
+              res.result.forEach(item => {
+                var html = `
+                <div class="item" id="item_${item.id}" _id="${item.id}">
+                  <canvas></canvas>
+                  <div class="btns">
+                      <a href="javascript:editWork(${item.id});">编 辑</a>
+                      <a href="javascript:showFullDialog(true, ${
+                        item.id
+                      });">全 屏</a>
+                      <a href="javascript:zangWork(${item.id});">赞(${
+                  item.zang
+                })</a>
+                  </div>
+                  <div class="item_info" >
+                    <div><span>${decodeURIComponent(item.name)}</span></div>
+                    <div><span>标签：${decodeURIComponent(
+                      item.tags
+                    )}</span></div>
+                  </div>
+                </div>
+                `;
+                works.innerHTML += html;
+                pagerData[item.id] = item;
+                (item => {
+                  setTimeout(() => {
+                    genCanvas(item);
+                  }, 10);
+                })(item);
+              });
+            }
+          }
+        });
+      }
+
+      function pushData() {
+        var err = document.querySelector("#err");
+        err.textContent = "";
+
+        var name = document.querySelector("#name").value;
+        var tags = document.querySelector("#tags").value;
+
+        if (name.trim().length == 0) {
+          err.textContent = "名称不能为空";
+          return;
+        } else if (tags.trim().length == 0) {
+          err.textContent = "标签不能为空";
+          return;
+        }
+
+        var data = {
+          r: rstr,
+          g: gstr,
+          b: bstr,
+          name: name,
+          tags: tags,
+          defualt_set: JSON.stringify({
+            offsetX: offsetX,
+            offsetY: offsetY,
+            t: t,
+            scaleV: scaleV
+          })
+        };
+
+        post("wp/push", data, (res, err) => {
+          if (res) {
+            showInfoDialog(true, "提交成功！");
+            console.log(res);
+          } else if (err) {
+            showInfoDialog(true, "提交失败！");
+            console.error(err);
+          }
+          showPushDialog(false);
+        });
       }
 
       window.onload = function() {

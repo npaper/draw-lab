@@ -1,0 +1,8 @@
+mysql:
+  user: work
+  password: work
+  url: 127.0.0.1:3306
+  database: test
+server:
+  port: 8083
+  static: ../../wallpapor/
